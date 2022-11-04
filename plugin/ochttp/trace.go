@@ -18,6 +18,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptrace"
+	"strings"
 
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/trace"
@@ -154,9 +155,12 @@ func requestAttrs(r *http.Request) []trace.Attribute {
 	userAgent := r.UserAgent()
 
 	attrs := make([]trace.Attribute, 0, 5)
+	// RCCA-9454: Remove query parameters from URL.
+	// Cut the URL string at the first occurrence of '?' and discard the query parameters.
+	urlAttr, _, _ := strings.Cut(r.URL.String(), "?")
 	attrs = append(attrs,
 		trace.StringAttribute(PathAttribute, r.URL.Path),
-		trace.StringAttribute(URLAttribute, r.URL.String()),
+		trace.StringAttribute(URLAttribute, urlAttr),
 		trace.StringAttribute(HostAttribute, r.Host),
 		trace.StringAttribute(MethodAttribute, r.Method),
 	)

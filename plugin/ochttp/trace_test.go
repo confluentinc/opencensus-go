@@ -476,6 +476,21 @@ func TestRequestAttributes(t *testing.T) {
 				trace.StringAttribute("http.user_agent", "ua"),
 			},
 		},
+		{
+			name: "GET example.com/hello?secret=todrop",
+			makeReq: func() *http.Request {
+				req, _ := http.NewRequest("GET", "http://example.com:779/hello?secret=todrop", nil)
+				req.Header.Add("User-Agent", "ua")
+				return req
+			},
+			wantAttrs: []trace.Attribute{
+				trace.StringAttribute("http.path", "/hello"),
+				trace.StringAttribute("http.url", "http://example.com:779/hello"),
+				trace.StringAttribute("http.host", "example.com:779"),
+				trace.StringAttribute("http.method", "GET"),
+				trace.StringAttribute("http.user_agent", "ua"),
+			},
+		},
 	}
 
 	for _, tt := range tests {
